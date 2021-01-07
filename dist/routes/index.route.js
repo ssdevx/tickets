@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var express_1 = require("express");
+//import usuarioRouter from './usuario';
+//import sucursalRouter from './sucursal';
+var userRouter = require('./sucursal.route');
+var router = express_1.Router();
+//router.use('');
+//router.use(usuarioRouter);
+router.use(userRouter);
+exports.default = router;
