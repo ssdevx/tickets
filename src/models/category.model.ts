@@ -1,11 +1,10 @@
 
 import { query } from './index.model';
+const { multipleColumnSet } = require('../utils/common.utils');
 
-const { multipleColumnSet, multipleColumnGet } = require('../utils/common.utils');
+class CategoryModel {
 
-class SubcategoryModel {
-
-    tabla: String = 'subcategoria';
+    tabla: String = 'categoria';
 
     find = async (params = { }) => {
         let sql = `SELECT * FROM ${this.tabla}`;
@@ -23,7 +22,7 @@ class SubcategoryModel {
 
     findOne = async (params: any) => {
 
-        const { columnSet, values } = multipleColumnGet(params)
+        const { columnSet, values } = multipleColumnSet(params)
 
         const sql = `SELECT * FROM ${this.tabla}
         WHERE ${columnSet}`;
@@ -37,12 +36,12 @@ class SubcategoryModel {
 
     create = async (params: any) => {
 
-        const { id_categoria, nombre} = params;
-
         const sql = `INSERT INTO ${this.tabla} 
-            (id_categoria, nombre, activo) VALUES (?, ?, ?)`;
+            (descripcion, activo) VALUES (?, ?)`;
 
-        const result = await query(sql, [id_categoria, nombre, 1]);
+        const { descripcion} = params;
+        
+        const result = await query(sql, [descripcion, 1]);
 
         const filasAfectadas = result ? result.affectedRows : 0;
 
@@ -53,11 +52,11 @@ class SubcategoryModel {
 
     update = async (params: any, id: number) => {
 
-        const { columnSet, values } = multipleColumnSet(params)
+        const { descripcion } = params;
 
-        const sql = `UPDATE ${this.tabla} SET ${columnSet} WHERE id_subcategoria = ?`;
+        const sql = `UPDATE ${this.tabla} SET descripcion = ? WHERE id_categoria = ?`;
 
-        const result = await query(sql, [...values, id]);
+        const result = await query(sql, [descripcion, id]);
 
         return result;
 
@@ -68,7 +67,7 @@ class SubcategoryModel {
 
         const { activo } = params;
 
-        const sql = `UPDATE ${this.tabla} SET activo = ? WHERE id_subcategoria = ?`;
+        const sql = `UPDATE ${this.tabla} SET activo = ? WHERE id_categoria = ?`;
 
         const result = await query(sql, [activo, id]);
 
@@ -76,10 +75,7 @@ class SubcategoryModel {
 
     }
 
-
-    
-
 }
 
 
-module.exports = new SubcategoryModel;
+module.exports = new CategoryModel;

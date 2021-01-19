@@ -1,5 +1,5 @@
 "use strict";
-var _a = require('express-validator'), body = _a.body, check = _a.check;
+const { body, check } = require('express-validator');
 exports.createuserSchema = [];
 exports.validateLogin = [
     check('correo')

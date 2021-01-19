@@ -1,9 +1,6 @@
 import mysql = require('mysql2');
-//require('dotenv').config();
 const dotenv = require('dotenv');
 dotenv.config();
-
-//dotenv.config();
 
 class Conexion {
 
@@ -18,9 +15,9 @@ class Conexion {
 
         this.pool = mysql.createPool({
             host: process.env.DB_HOST,
-            user: 'root',
-            password: '',
-            database: 'tickets_v2', 
+            user: process.env.DB_USER,
+            password: process.env.DB_PASS,
+            database: process.env.DB_DATABASE, 
             connectionLimit: 5
         })
 
@@ -33,15 +30,6 @@ class Conexion {
         return this._instance || (this._instance = new this());
     }
     
-
-    // static async executeQuery(query: string) {
-    //     try {
-    //       return this.instance.pool.query(query);
-    //     } catch(error) { 
-    //         throw error 
-    //     }
-    // }
-
 
     private conectarDB(){
        try {

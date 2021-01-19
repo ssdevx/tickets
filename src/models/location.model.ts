@@ -3,9 +3,9 @@ import { query } from './index.model';
 
 const { multipleColumnSet } = require('../utils/common.utils');
 
-class CategoriaModel {
+class LocationModel {
 
-    tabla: String = 'categoria';
+    tabla: string = 'sucursal';
 
     find = async (params = { }) => {
         let sql = `SELECT * FROM ${this.tabla}`;
@@ -22,6 +22,7 @@ class CategoriaModel {
         return await query(sql, [...values]);
     }
 
+
     findOne = async (params: any) => {
 
         const { columnSet, values } = multipleColumnSet(params)
@@ -35,12 +36,15 @@ class CategoriaModel {
 
     }
 
-    create = async ({ descripcion = '', activo = 1 }) => {
+
+    create = async (params : any) => {
 
         const sql = `INSERT INTO ${this.tabla} 
             (descripcion, activo) VALUES (?, ?)`;
 
-        const result = await query(sql, [descripcion, activo]);
+        const { descripcion } = params;
+
+        const result = await query(sql, [descripcion, 1]);
 
         const filasAfectadas = result ? result.affectedRows : 0;
 
@@ -62,11 +66,13 @@ class CategoriaModel {
     }
 
 
-    delete = async (id : number) => {
+    enableDisable = async (params: any, id : number) => {
 
-        const sql = `UPDATE ${this.tabla} SET activo = 0 WHERE id_sucursal = ?`;
+        const { activo } = params;
 
-        const result = await query(sql, [id]);
+        const sql = `UPDATE ${this.tabla} SET activo = ? WHERE id_sucursal = ?`;
+
+        const result = await query(sql, [activo, id]);
 
         return result;
 
@@ -75,4 +81,4 @@ class CategoriaModel {
 }
 
 
-module.exports = new CategoriaModel;
+module.exports = new LocationModel;

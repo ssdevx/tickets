@@ -1,13 +1,25 @@
 "use strict";
-exports.multipleColumnSet = function (object) {
+exports.multipleColumnSet = (object) => {
     if (typeof object !== 'object') {
         throw new Error('Invalid input');
     }
-    var keys = Object.keys(object);
-    var values = Object.values(object);
-    var columnSet = keys.map(function (key) { return key + " = ?"; }).join(', ');
+    const keys = Object.keys(object);
+    const values = Object.values(object);
+    let columnSet = keys.map(key => `${key} = ?`).join(', ');
     return {
-        columnSet: columnSet,
-        values: values
+        columnSet,
+        values
+    };
+};
+exports.multipleColumnGet = (object) => {
+    if (typeof object !== 'object') {
+        throw new Error('Invalid input');
+    }
+    const keys = Object.keys(object);
+    const values = Object.values(object);
+    let columnSet = keys.map(key => `${key} = ?`).join(' AND ');
+    return {
+        columnSet,
+        values
     };
 };

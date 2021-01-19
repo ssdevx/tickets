@@ -9,83 +9,114 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const SubcategoryModel = require('../models/subcategory.model');
-class SubcategoryController {
+const LocationModel = require('../models/location.model');
+class LocationController {
     constructor() {
-        this.getAllSubcategories = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.getAllLocations = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                let subcategoryList = yield SubcategoryModel.find({ activo: req.body.activo });
-                if (!subcategoryList.length) {
+                let listaSucursales = yield LocationModel.find({ activo: req.body.activo });
+                if (!listaSucursales.length) {
                     return res.status(404).json({
                         ok: false,
                         error: {
-                            message: 'No se encontraron subcategorias'
-                        }
-                    });
-                }
-                res.status(200).json({
-                    ok: true,
-                    data: subcategoryList
-                });
-            }
-            catch (error) {
-                next(`No se puede procesar el request ${error}`);
-            }
-        });
-        this.getSubcategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const subcategory = yield SubcategoryModel.findOne({ id_subcategoria: req.params.id });
-                if (!subcategory) {
-                    return res.status(404).json({
-                        ok: false,
-                        error: {
-                            message: 'No se encontró sub categoria'
+                            message: 'No se encontró sucursales'
                         }
                     });
                 }
                 res.json({
                     ok: true,
-                    data: subcategory
+                    listaSucursales
+                });
+            }
+            catch (error) {
+                next(`No se pudo procesar el request ${error}`);
+            }
+        });
+        this.getLocationById = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const sucursal = yield LocationModel.findOne({ id_sucursal: req.params.id });
+                if (!sucursal) {
+                    return res.status(404).json({
+                        ok: false,
+                        error: {
+                            message: 'No se encontró sucursal'
+                        }
+                    });
+                }
+                res.json({
+                    ok: true,
+                    sucursal
                 });
             }
             catch (error) {
                 next(`No se puede procesar el request ${error}`);
             }
         });
-        this.createSubcategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.createLocation = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const subcategoryExists = yield this.checkDuplicates(req);
-                if (subcategoryExists) {
-                    const result = yield SubcategoryModel.create(req.body);
+                const locationExists = yield LocationModel.findOne({ descripcion: req.body.descripcion });
+                if (!locationExists) {
+                    const result = yield LocationModel.create(req.body);
                     if (!result) {
-                        return res.status(400).json({
+                        return res.status(500).json({
                             ok: false,
                             error: {
-                                message: 'Error al crear subcategoria.'
+                                message: 'Ocurrió un error en el proceso de insersion'
                             }
                         });
                     }
                     res.status(201).json({
                         ok: true,
-                        message: 'SubCategoria creado correctamente'
+                        message: 'Sucursal creado correctamente'
                     });
                 }
                 else {
-                    return res.status(400).json({
+                    return res.status(500).json({
                         ok: false,
                         error: {
-                            message: 'La subcategoria ya está registrado en la BD.'
+                            message: 'Sucursal está registrado en la bd'
                         }
                     });
                 }
             }
             catch (error) {
+                next(`Error al processar el request: ${error}`);
+            }
+        });
+        this.updateLocation = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield LocationModel.update(req.body, req.params.id);
+                const { affectedRows, info } = result;
+                if (!result) {
+                    return res.status(500).json({
+                        ok: false,
+                        error: {
+                            message: 'Ocurrió un error en el proceso de actualización'
+                        }
+                    });
+                }
+                if (!affectedRows) {
+                    return res.status(404).json({
+                        ok: false,
+                        error: {
+                            message: 'Sucursal no existe',
+                            info
+                        }
+                    });
+                }
+                res.status(200).json({
+                    ok: true,
+                    message: 'Sucursal actualizado correctamente',
+                    info
+                });
+            }
+            catch (error) {
                 next(`No se puede procesar el request ${error}`);
             }
         });
-        this.updateSubcategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.enableDisableLocation = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield SubcategoryModel.update(req.body, req.params.id);
+                const result = yield LocationModel.enableDisable(req.body, req.params.id);
                 if (!result) {
                     return res.status(404).json({
                         ok: false,
@@ -99,61 +130,21 @@ class SubcategoryController {
                     return res.status(404).json({
                         ok: false,
                         error: {
-                            message: 'Subcategoria no existe',
+                            message: 'Sucursal no existe',
                             info
                         }
                     });
                 }
                 res.status(200).json({
                     ok: true,
-                    message: 'Subcategoria actualizado correctamente',
+                    message: 'Estatus sucursal actualizado correctamente',
                     info
                 });
             }
             catch (error) {
                 next(`No se puede procesar el request ${error}`);
-            }
-        });
-        this.enableDisableSubcategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield SubcategoryModel.enableDisable(req.body, req.params.id);
-                if (!result) {
-                    return res.status(404).json({
-                        ok: false,
-                        error: {
-                            message: 'Ha ocurrido un error'
-                        }
-                    });
-                }
-                const { affectedRows, info } = result;
-                if (!affectedRows) {
-                    return res.status(404).json({
-                        ok: false,
-                        error: {
-                            message: 'Subcategoria no existe',
-                            info
-                        }
-                    });
-                }
-                res.status(200).json({
-                    ok: true,
-                    message: 'Estatus subcategoria actualizado correctamente',
-                    info
-                });
-            }
-            catch (error) {
-                next(`No se puede procesar el request ${error}`);
-            }
-        });
-        this.checkDuplicates = (req) => __awaiter(this, void 0, void 0, function* () {
-            const subcategory = yield SubcategoryModel.findOne({ nombre: req.body.nombre, id_categoria: req.body.id_categoria });
-            if (!subcategory) {
-                return true;
-            }
-            else {
-                return false;
             }
         });
     }
 }
-module.exports = new SubcategoryController;
+module.exports = new LocationController;

@@ -1,27 +1,27 @@
 import { NextFunction, Request, Response} from 'express';
-const SubcategoryModel = require('../models/subcategory.model');
+const CategoryModel = require('../models/category.model');
 
 
-class SubcategoryController {
+class CategoryController {
 
-    getAllSubcategories = async (req: Request, res: Response, next: NextFunction) => {
+    getAllCategories = async (req: Request, res: Response, next: NextFunction) => {
 
         try {
 
-            let subcategoryList = await SubcategoryModel.find({ activo: req.body.activo});
+            let categoryList = await CategoryModel.find({ activo: req.body.activo});
 
-            if (!subcategoryList.length) {
+            if (!categoryList.length) {
                 return res.status(404).json({
                     ok: false, 
                     error: {
-                        message: 'No se encontraron subcategorias'
+                        message: 'No se encontraron categorias'
                     }
-                })            
+                })         
             }
 
             res.status(200).json({
                 ok: true,
-                data: subcategoryList
+                data: categoryList
             })
             
         } catch (error) {
@@ -30,55 +30,54 @@ class SubcategoryController {
     };
 
 
-    getSubcategory = async (req: Request, res: Response, next: NextFunction) => {
+    getCategory = async (req: Request, res: Response, next: NextFunction) => {
         
         try {
 
-            const subcategory = await SubcategoryModel.findOne({ id_subcategoria: req.params.id});
+            const category = await CategoryModel.findOne({ id_categoria: req.params.id});
 
-            if (!subcategory) {
+            if (!category) {
                 return res.status(404).json({
                     ok: false,
                     error: {
-                        message: 'No se encontró sub categoria'
+                        message: 'No se encontró categoria'
                     }
                 })
             }
 
             res.json({
                 ok: true,
-                data: subcategory
+                data: category
             });
             
         } catch (error) {
             next(`No se puede procesar el request ${error}`)
         }
-
     };
 
     
-    createSubcategory = async(req: Request, res: Response, next: NextFunction ) => {
+    createCategory = async(req: Request, res: Response, next: NextFunction ) => {
 
         try {
             
-            const subcategoryExists = await this.checkDuplicates(req);
+            const categoryExists = await CategoryModel.findOne({descripcion : req.body.descripcion});
 
-            if(subcategoryExists){
+            if(!categoryExists){
 
-                const result = await SubcategoryModel.create(req.body);
+                const result = await CategoryModel.create(req.body);
 
                 if(!result){
                     return res.status(400).json({
                         ok: false, 
                         error: {
-                            message: 'Error al crear subcategoria.'
+                            message: 'Error al crear categoria.'
                         }
                     })
                 }
 
                 res.status(201).json({
                     ok: true, 
-                    message: 'SubCategoria creado correctamente'
+                    message: 'Categoria creado correctamente'
                 })
 
             } else {
@@ -86,7 +85,7 @@ class SubcategoryController {
                 return res.status(400).json({
                     ok: false, 
                     error: {
-                        message: 'La subcategoria ya está registrado en la BD.'
+                        message: 'La categoria ya está registrado en la BD.'
                     }
                 })
             }
@@ -94,14 +93,14 @@ class SubcategoryController {
         } catch (error) {
             next(`No se puede procesar el request ${error}`)
         }
-
     }
 
 
-    updateSubcategory = async (req:Request, res: Response, next: NextFunction) => {
+    updateCategory = async(req: Request, res: Response, next: NextFunction) => {
+
         try {
             
-            const result = await SubcategoryModel.update(req.body, req.params.id);
+            const result = await CategoryModel.update(req.body, req.params.id);
 
             if(!result){
                 return res.status(404).json({
@@ -118,7 +117,7 @@ class SubcategoryController {
                 return res.status(404).json({
                     ok: false,
                     error: {
-                        message: 'Subcategoria no existe',
+                        message: 'Categoria no existe',
                         info
                     }
                 })
@@ -126,22 +125,21 @@ class SubcategoryController {
 
             res.status(200).json({ 
                 ok: true,
-                message: 'Subcategoria actualizado correctamente', 
+                message: 'Categoria actualizado correctamente', 
                 info 
             });
 
         } catch (error) {
-           
             next(`No se puede procesar el request ${error}`)
         }
     }
 
 
-    enableDisableSubcategory = async(req: Request, res: Response, next: NextFunction) => {
+    enableDisableCategory = async(req: Request, res: Response, next: NextFunction) => {
 
         try {
             
-            const result = await SubcategoryModel.enableDisable(req.body, req.params.id);
+            const result = await CategoryModel.enableDisable(req.body, req.params.id);
 
             if(!result){
                 return res.status(404).json({
@@ -158,7 +156,7 @@ class SubcategoryController {
                 return res.status(404).json({
                     ok: false,
                     error: {
-                        message: 'Subcategoria no existe',
+                        message: 'Categoria no existe',
                         info
                     }
                 })
@@ -166,7 +164,7 @@ class SubcategoryController {
 
             res.status(200).json({ 
                 ok: true,
-                message: 'Estatus subcategoria actualizado correctamente', 
+                message: 'Estatus categoria actualizado correctamente', 
                 info 
             });
 
@@ -175,20 +173,18 @@ class SubcategoryController {
         }
     }
 
-    checkDuplicates = async(req: Request) => {
-        
-        const subcategory = await SubcategoryModel.findOne({nombre : req.body.nombre, id_categoria : req.body.id_categoria});
+    // checkValidation = async (req: Request, next: NextFunction) => {
 
-        if (!subcategory){
+    //     const errors = validationResult(req)
 
-            return true;
+    //     console.log(errors.Result);
 
-        } else {
+    //     if (!errors.isEmpty()) {
+    //         //throw new HttpException(400, 'Validation faild', errors);
+    //         next( new ErrorResponse(400, `Validacion fallida`, errors.Result))            
+    //     }
+    // }
 
-            return false;
-        }
-        
-    }
 }
 
-module.exports = new SubcategoryController;
+module.exports = new CategoryController;

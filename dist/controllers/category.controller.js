@@ -9,72 +9,72 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const SubcategoryModel = require('../models/subcategory.model');
-class SubcategoryController {
+const CategoryModel = require('../models/category.model');
+class CategoryController {
     constructor() {
-        this.getAllSubcategories = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.getAllCategories = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                let subcategoryList = yield SubcategoryModel.find({ activo: req.body.activo });
-                if (!subcategoryList.length) {
+                let categoryList = yield CategoryModel.find({ activo: req.body.activo });
+                if (!categoryList.length) {
                     return res.status(404).json({
                         ok: false,
                         error: {
-                            message: 'No se encontraron subcategorias'
+                            message: 'No se encontraron categorias'
                         }
                     });
                 }
                 res.status(200).json({
                     ok: true,
-                    data: subcategoryList
+                    data: categoryList
                 });
             }
             catch (error) {
                 next(`No se puede procesar el request ${error}`);
             }
         });
-        this.getSubcategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.getCategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const subcategory = yield SubcategoryModel.findOne({ id_subcategoria: req.params.id });
-                if (!subcategory) {
+                const category = yield CategoryModel.findOne({ id_categoria: req.params.id });
+                if (!category) {
                     return res.status(404).json({
                         ok: false,
                         error: {
-                            message: 'No se encontró sub categoria'
+                            message: 'No se encontró categoria'
                         }
                     });
                 }
                 res.json({
                     ok: true,
-                    data: subcategory
+                    data: category
                 });
             }
             catch (error) {
                 next(`No se puede procesar el request ${error}`);
             }
         });
-        this.createSubcategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.createCategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const subcategoryExists = yield this.checkDuplicates(req);
-                if (subcategoryExists) {
-                    const result = yield SubcategoryModel.create(req.body);
+                const categoryExists = yield CategoryModel.findOne({ descripcion: req.body.descripcion });
+                if (!categoryExists) {
+                    const result = yield CategoryModel.create(req.body);
                     if (!result) {
                         return res.status(400).json({
                             ok: false,
                             error: {
-                                message: 'Error al crear subcategoria.'
+                                message: 'Error al crear categoria.'
                             }
                         });
                     }
                     res.status(201).json({
                         ok: true,
-                        message: 'SubCategoria creado correctamente'
+                        message: 'Categoria creado correctamente'
                     });
                 }
                 else {
                     return res.status(400).json({
                         ok: false,
                         error: {
-                            message: 'La subcategoria ya está registrado en la BD.'
+                            message: 'La categoria ya está registrado en la BD.'
                         }
                     });
                 }
@@ -83,9 +83,9 @@ class SubcategoryController {
                 next(`No se puede procesar el request ${error}`);
             }
         });
-        this.updateSubcategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.updateCategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield SubcategoryModel.update(req.body, req.params.id);
+                const result = yield CategoryModel.update(req.body, req.params.id);
                 if (!result) {
                     return res.status(404).json({
                         ok: false,
@@ -99,14 +99,14 @@ class SubcategoryController {
                     return res.status(404).json({
                         ok: false,
                         error: {
-                            message: 'Subcategoria no existe',
+                            message: 'Categoria no existe',
                             info
                         }
                     });
                 }
                 res.status(200).json({
                     ok: true,
-                    message: 'Subcategoria actualizado correctamente',
+                    message: 'Categoria actualizado correctamente',
                     info
                 });
             }
@@ -114,9 +114,9 @@ class SubcategoryController {
                 next(`No se puede procesar el request ${error}`);
             }
         });
-        this.enableDisableSubcategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.enableDisableCategory = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield SubcategoryModel.enableDisable(req.body, req.params.id);
+                const result = yield CategoryModel.enableDisable(req.body, req.params.id);
                 if (!result) {
                     return res.status(404).json({
                         ok: false,
@@ -130,14 +130,14 @@ class SubcategoryController {
                     return res.status(404).json({
                         ok: false,
                         error: {
-                            message: 'Subcategoria no existe',
+                            message: 'Categoria no existe',
                             info
                         }
                     });
                 }
                 res.status(200).json({
                     ok: true,
-                    message: 'Estatus subcategoria actualizado correctamente',
+                    message: 'Estatus categoria actualizado correctamente',
                     info
                 });
             }
@@ -145,15 +145,14 @@ class SubcategoryController {
                 next(`No se puede procesar el request ${error}`);
             }
         });
-        this.checkDuplicates = (req) => __awaiter(this, void 0, void 0, function* () {
-            const subcategory = yield SubcategoryModel.findOne({ nombre: req.body.nombre, id_categoria: req.body.id_categoria });
-            if (!subcategory) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        });
+        // checkValidation = async (req: Request, next: NextFunction) => {
+        //     const errors = validationResult(req)
+        //     console.log(errors.Result);
+        //     if (!errors.isEmpty()) {
+        //         //throw new HttpException(400, 'Validation faild', errors);
+        //         next( new ErrorResponse(400, `Validacion fallida`, errors.Result))            
+        //     }
+        // }
     }
 }
-module.exports = new SubcategoryController;
+module.exports = new CategoryController;

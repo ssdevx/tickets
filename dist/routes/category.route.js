@@ -1,9 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = require("express");
-var router = express_1.Router();
-var categoryController = require('../controllers/categoria.controller');
-router.get('/categoria', categoryController.getAllCategories);
-router.get('/categoria/:id', categoryController.getCategory);
-router.post('/categoria', categoryController.createCategory);
+const express_1 = require("express");
+const router = express_1.Router();
+const { checkToken, checkAdminRole } = require('../middlewares/auth.middleware');
+const categoryController = require('../controllers/category.controller');
+router.get('/category', [checkToken, checkAdminRole], categoryController.getAllCategories);
+router.get('/category/:id', [checkToken, checkAdminRole], categoryController.getCategory);
+router.post('/category', [checkToken, checkAdminRole], categoryController.createCategory);
+router.put('/category/:id', [checkToken, checkAdminRole], categoryController.updateCategory);
+router.delete('/category/:id', [checkToken, checkAdminRole], categoryController.enableDisableCategory);
 module.exports = router;
